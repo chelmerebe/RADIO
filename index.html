@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Funny Gibberish Radio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .radio-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .display {
+            background: #333;
+            color: #4ecdc4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 100px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background: #4ecdc4;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.1s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .settings {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .settings label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .radio-waves {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            margin: 20px auto;
+        }
+
+        .wave {
+            position: absolute;
+            border: 2px solid #4ecdc4;
+            border-radius: 50%;
+            animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 50px; height: 50px; opacity: 0; }
+        }
+
+        .wave:nth-child(1) { animation-delay: 0s; }
+        .wave:nth-child(2) { animation-delay: 0.3s; }
+        .wave:nth-child(3) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="radio-container">
+        <h1>🎙️ Funny Gibberish Radio</h1>
+
+        <div class="radio-waves">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+
+        <div class="display" id="output">Waiting to start...</div>
+
+        <div class="controls">
+            <button onclick="startBroadcast()" id="startBtn">🎵 Start</button>
+            <button onclick="stopBroadcast()" id="stopBtn" disabled>⏹️ Stop</button>
+        </div>
+
+        <div class="settings">
+            <label>
+                Speech Rate:
+                <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
+            </label>
+            <label>
+                Voice Pitch:
+                <input type="range" id="pitchSlider" min="0.1" max="2" step="0.1" value="1">
+            </label>
+        </div>
+
+        <div>
+            <button onclick="makeVoiceOld()">🧓 Old Man</button>
+            <button onclick="makeVoiceKid()">👶 Kid</button>
+            <button onclick="makeVoiceRobot()">🤖 Robot</button>
+            <button onclick="makeVoiceNormal()">👤 Normal</button>
+        </div>
+    </div>
+
+    <script>
+        const funnySyllables = ['bobo', 'dodo', 'gogo', 'momo', 'papa', 'toto', 'zozo', 'kiki', 'lulu', 'nunu',
+                               'wibbly', 'wobbly', 'zing', 'zoop', 'beep', 'boop', 'ding', 'dong'];
+
+        const singingPatterns = [
+            "boom chika boom",
+            "ding dong ding",
+            "beep boop beep",
+            "la dee da",
+            "wobble wobble",
+            "zip zap zoom",
+            "ping pong pop",
+            "tiki tiki",
+            "bam bam boo"
+        ];
+
+        let isRunning = false;
+        let currentUtterance = null;
+
+        function createGibberishWord() {
+            if (Math.random() < 0.7) {  // 70% chance for funny syllables
+                const word1 = funnySyllables[Math.floor(Math.random() * funnySyllables.length)];
+                const word2 = Math.random() < 0.3 ?
+                    funnySyllables[Math.floor(Math.random() * funnySyllables.length)] : '';
+                return word1 + ' ' + word2;
+            }
+            return funnySyllables[Math.floor(Math.random() * funnySyllables.length)];
+        }
+
+        function generateGibberishSentence() {
+            const wordsCount = Math.floor(Math.random() * 3) + 2;  // 2-4 words
+            let sentence = [];
+            for(let i = 0; i < wordsCount; i++) {
+                sentence.push(createGibberishWord());
+            }
+            return sentence.join(' ');
+        }
+
+        function createSingingPattern() {
+            return singingPatterns[Math.floor(Math.random() * singingPatterns.length)];
+        }
+
+        function updateDisplay(text) {
+            const output = document.getElementById('output');
+            output.textContent = text;
+        }
+
+        async function speak(text, isSinging = false) {
+            if (!isRunning) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            currentUtterance = utterance;
+
+            utterance.rate = isSinging ?
+                parseFloat(rateSlider.value) * (Math.random() * 0.2 + 0.7) :
+                parseFloat(rateSlider.value);
+
+            utterance.pitch = isSinging ?
+                parseFloat(pitchSlider.value) * (Math.random() * 0.7 + 0.8) :
+                parseFloat(pitchSlider.value);
+
+            return new Promise(resolve => {
+                utterance.onend = resolve;
+                speechSynthesis.speak(utterance);
+            });
+        }
+
+        async function broadcastLoop() {
+            while (isRunning) {
+                const shouldSing = Math.random() < 0.4;  // 40% chance to sing
+
+                if (shouldSing) {
+                    const pattern = createSingingPattern();
+                    const lyrics = `${pattern} ${generateGibberishSentence()} ${pattern}`;
+                    updateDisplay(`🎵 Singing: ${lyrics}`);
+                    await speak(lyrics, true);
+                } else {
+                    const sentence = generateGibberishSentence();
+                    updateDisplay(`🗣️ Speaking: ${sentence}`);
+                    await speak(sentence);
+                }
+
+                if (isRunning) {
+                    await new Promise(r => setTimeout(r, Math.random() * 1200 + 300));
+                }
+            }
+        }
+
+        function makeVoiceOld() {
+            rateSlider.value = "0.7";  // Slower speech
+            pitchSlider.value = "0.7";  // Lower pitch
+        }
+
+        function makeVoiceKid() {
+            rateSlider.value = "1.3";  // Faster speech
+            pitchSlider.value = "1.5";  // Higher pitch
+        }
+
+        function makeVoiceRobot() {
+            rateSlider.value = "0.9";  // Slightly slower
+            pitchSlider.value = "0.3";  // Very low pitch
+        }
+
+        function makeVoiceNormal() {
+            rateSlider.value = "1";
+            pitchSlider.value = "1";
+        }
+
+        function startBroadcast() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                broadcastLoop();
+            }
+        }
+
+        function stopBroadcast() {
+            isRunning = false;
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+            }
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            updateDisplay('Broadcast stopped...');
+        }
+    </script>
+</body>
+</html>
