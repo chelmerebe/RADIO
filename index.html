@@ -93,20 +93,20 @@
 <body>
     <div class="radio-container">
         <h1>🎙️ Funny Gibberish Radio</h1>
-
+        
         <div class="radio-waves">
             <div class="wave"></div>
             <div class="wave"></div>
             <div class="wave"></div>
         </div>
-
+        
         <div class="display" id="output">Waiting to start...</div>
-
+        
         <div class="controls">
             <button onclick="startBroadcast()" id="startBtn">🎵 Start</button>
             <button onclick="stopBroadcast()" id="stopBtn" disabled>⏹️ Stop</button>
         </div>
-
+        
         <div class="settings">
             <label>
                 Speech Rate:
@@ -127,40 +127,143 @@
     </div>
 
     <script>
-        const funnySyllables = ['bobo', 'dodo', 'gogo', 'momo', 'papa', 'toto', 'zozo', 'kiki', 'lulu', 'nunu',
-                               'wibbly', 'wobbly', 'zing', 'zoop', 'beep', 'boop', 'ding', 'dong'];
-
+        const funnySyllables = [
+            // מילים מתנגנות בסיסיות
+            'bobo', 'dodo', 'gogo', 'momo', 'papa', 'toto', 'zozo', 'kiki', 'lulu', 'nunu',
+            // צלילים רובוטיים
+            'beep', 'boop', 'bzzzt', 'whirr', 'buzz', 'ping', 'pong', 'zoop', 'zip', 'zap',
+            // מילים מתגלגלות
+            'wibbly', 'wobbly', 'jiggly', 'squiggly', 'bubbly', 'giggly', 'wiggly', 'swoosh', 'whoosh', 'zoom',
+            // צלילי חיות
+            'meow', 'woof', 'oink', 'moo', 'baa', 'quack', 'ribbit', 'tweet', 'hoot', 'roar',
+            // צלילים מוזיקליים
+            'ding', 'dong', 'bang', 'boom', 'clap', 'snap', 'tap', 'toot', 'drum', 'strum',
+            // מילים מצחיקות
+            'silly', 'funny', 'loopy', 'goofy', 'dizzy', 'wacky', 'quirky', 'bonkers', 'zany', 'dotty',
+            // צלילי קרטון
+            'splat', 'boing', 'pow', 'zowie', 'bam', 'kapow', 'clash', 'crash', 'splash', 'smoosh',
+            // מילים חוזרות
+            'yada', 'blah', 'lalala', 'nanana', 'yadda', 'babble', 'gabba', 'yackety', 'chatter', 'pitter',
+            // רעשי רקע
+            'swish', 'swoosh', 'whoop', 'whisper', 'rattle', 'rumble', 'tinkle', 'jingle', 'crackle', 'pop',
+            // מילים משעשעות במיוחד
+            'flibbertigibbet', 'hobbledehoy', 'cattywampus', 'kerfuffle', 'brouhaha', 'hullabaloo',
+            'gobbledygook', 'shenanigans', 'rigmarole', 'balderdash'
+        ];
+                               
         const singingPatterns = [
-            "boom chika boom",
-            "ding dong ding",
-            "beep boop beep",
-            "la dee da",
-            "wobble wobble",
-            "zip zap zoom",
-            "ping pong pop",
-            "tiki tiki",
-            "bam bam boo"
+            // דפוסי שירה בסיסיים
+            "boom chika boom", "ding dong ding", "beep boop beep", 
+            "la dee da", "wobble wobble", "zip zap zoom",
+            
+            // שירים מפורסמים
+            "sha la la la", "doo wop doo wop", "na na na na",
+            "hey hey hey", "bom bom bom", "shoop shoop shoop",
+            
+            // מקצבים מצחיקים
+            "wiggle wiggle pop", "zoom zoom kapow", "bing bang boom",
+            "splish splash splosh", "tick tock rock", "hip hop beep",
+            
+            // קולות רובוטיים
+            "beep beep whirr", "boop boop buzz", "ping ping zoop",
+            "zap zap zing", "click clack clunk", "whizz bang pop",
+            
+            // צירופים מצחיקים
+            "hippity hoppity", "bibbity bobbity", "jiggety jaggety",
+            "wibbly wobbly", "splendid splashity", "zippity zappity",
+            
+            // מנגינות מתגלגלות
+            "ring ding dong", "boom boom pow", "zip zap zoop",
+            "ting tang tong", "flip flap flop", "swish swash swoosh",
+            
+            // קריאות התלהבות
+            "wowee zowee", "yippee yahoo", "whoopee doo",
+            "holy moly", "geez louise", "oh my my",
+            
+            // צלילי קרטון
+            "boing sproing doing", "kapow wham bam", "zoom zip zap",
+            "crash bash splash", "pop bang snap", "whoosh swoosh swish"
         ];
 
         let isRunning = false;
         let currentUtterance = null;
 
-        function createGibberishWord() {
-            if (Math.random() < 0.7) {  // 70% chance for funny syllables
-                const word1 = funnySyllables[Math.floor(Math.random() * funnySyllables.length)];
-                const word2 = Math.random() < 0.3 ?
-                    funnySyllables[Math.floor(Math.random() * funnySyllables.length)] : '';
-                return word1 + ' ' + word2;
+                // אותיות בסיסיות ליצירת מילים
+        const consonants = ['b', 'p', 'd', 't', 'g', 'k', 'z', 'v', 'f', 'm', 'n', 'l', 'r', 'w', 'y'];
+        const vowels = ['a', 'e', 'i', 'o', 'u', 'oo', 'ee', 'ay', 'ow'];
+        const endConsonants = ['p', 'k', 't', 'ng', 'm', 'n', 'b', 'g', 'd'];
+        
+        // סיומות מצחיקות
+        const funnyEndings = ['ble', 'dle', 'gle', 'zle', 'zzle', 'bble', 'pple', 'ttle', 'ffle', 'mble'];
+        
+        function createRandomSyllable() {
+            let syllable = '';
+            
+            // 80% סיכוי להתחיל עם עיצור
+            if (Math.random() < 0.8) {
+                syllable += consonants[Math.floor(Math.random() * consonants.length)];
+                // 20% סיכוי להוסיף עיצור שני (למשל "br", "fl")
+                if (Math.random() < 0.2) {
+                    syllable += 'r';
+                }
             }
-            return funnySyllables[Math.floor(Math.random() * funnySyllables.length)];
+            
+            // תמיד מוסיף תנועה
+            syllable += vowels[Math.floor(Math.random() * vowels.length)];
+            
+            // 60% סיכוי לסיים עם עיצור
+            if (Math.random() < 0.6) {
+                syllable += endConsonants[Math.floor(Math.random() * endConsonants.length)];
+            }
+            
+            return syllable;
+        }
+
+        function createRandomWord() {
+            // בוחר כמה הברות יהיו במילה (1-3)
+            const syllableCount = Math.floor(Math.random() * 2) + 1;
+            let word = '';
+            
+            for (let i = 0; i < syllableCount; i++) {
+                word += createRandomSyllable();
+            }
+            
+            // 30% סיכוי להוסיף סיומת מצחיקה
+            if (Math.random() < 0.3) {
+                word += funnyEndings[Math.floor(Math.random() * funnyEndings.length)];
+            }
+            
+            // 20% סיכוי לכפול את המילה
+            if (Math.random() < 0.2) {
+                word = word + ' ' + word;
+            }
+            
+            return word;
+        }
+
+        function createGibberishWord() {
+            // מערבב בין מילים אקראיות למילים קבועות
+            if (Math.random() < 0.3) {  // 30% סיכוי למילה מהרשימה הקבועה
+                return funnySyllables[Math.floor(Math.random() * funnySyllables.length)];
+            }
+            return createRandomWord();
         }
 
         function generateGibberishSentence() {
-            const wordsCount = Math.floor(Math.random() * 3) + 2;  // 2-4 words
+            // מגריל מספר מילים למשפט (2-5)
+            const wordsCount = Math.floor(Math.random() * 3) + 2;
             let sentence = [];
+            
             for(let i = 0; i < wordsCount; i++) {
                 sentence.push(createGibberishWord());
             }
+            
+            // 20% סיכוי להוסיף קריאת התפעלות בסוף
+            if (Math.random() < 0.2) {
+                const exclamations = ["oh my!", "wow!", "holy moly!", "goodness gracious!", "oh boy!", "yahoo!"];
+                sentence.push(exclamations[Math.floor(Math.random() * exclamations.length)]);
+            }
+            
             return sentence.join(' ');
         }
 
@@ -179,12 +282,12 @@
             const utterance = new SpeechSynthesisUtterance(text);
             currentUtterance = utterance;
 
-            utterance.rate = isSinging ?
-                parseFloat(rateSlider.value) * (Math.random() * 0.2 + 0.7) :
+            utterance.rate = isSinging ? 
+                parseFloat(rateSlider.value) * (Math.random() * 0.2 + 0.7) : 
                 parseFloat(rateSlider.value);
-
-            utterance.pitch = isSinging ?
-                parseFloat(pitchSlider.value) * (Math.random() * 0.7 + 0.8) :
+            
+            utterance.pitch = isSinging ? 
+                parseFloat(pitchSlider.value) * (Math.random() * 0.7 + 0.8) : 
                 parseFloat(pitchSlider.value);
 
             return new Promise(resolve => {
@@ -196,7 +299,7 @@
         async function broadcastLoop() {
             while (isRunning) {
                 const shouldSing = Math.random() < 0.4;  // 40% chance to sing
-
+                
                 if (shouldSing) {
                     const pattern = createSingingPattern();
                     const lyrics = `${pattern} ${generateGibberishSentence()} ${pattern}`;
